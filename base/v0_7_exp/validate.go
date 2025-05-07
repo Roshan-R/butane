@@ -26,6 +26,7 @@ import (
 func (rs Resource) Validate(c path.ContextPath) (r report.Report) {
 	var field string
 	sources := 0
+	// Local files are validated in the translateResource function
 	if rs.Local != nil {
 		sources++
 		field = "local"
@@ -33,6 +34,11 @@ func (rs Resource) Validate(c path.ContextPath) (r report.Report) {
 	if rs.Inline != nil {
 		sources++
 		field = "inline"
+		rp, err := ValidateIgnitionConfig(c, []byte(*rs.Inline))
+		r.Merge(rp)
+		if err != nil {
+			return
+		}
 	}
 	if rs.Source != nil {
 		sources++
